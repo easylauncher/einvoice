@@ -4,10 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<!-- Bootstrap CSS -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+<!-- Bootstrap 5 CSS -->
+<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gC1+soPr7B3jzJUv+ZSn8MlUNNNCZ83MWJn7N0fkpWEbC1Rx4sua6k5pVLVmI4uJ" crossorigin="anonymous"> -->
 
-<!-- Professional Font -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" >
+
+<!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link 
@@ -19,16 +21,9 @@
 <style>
   body {
     font-family: 'Roboto', sans-serif;
-    margin: 20px;
     background: #f9f9f9;
   }
-  h1, h2, h3 {
-    color: #333;
-  }
-  .card {
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    border-radius: 6px;
-  }
+
   .invoice-container {
     background: #fff;
     border: 1px solid #ddd;
@@ -36,31 +31,11 @@
     font-size: 0.9rem;
     padding: 20px;
   }
-  .invoice-header img {
-    max-height: 50px;
-  }
+
   .invoice-logo img {
     width: 200px;
     max-height: 200px;
     object-fit: contain;
-  }
-  .download-btn button,
-  .share-btn button,
-  .print-btn button {
-    background: #28a745;
-    border: none;
-    color: #fff;
-  }
-  .download-btn button:hover,
-  .share-btn button:hover,
-  .print-btn button:hover {
-    background: #218838;
-  }
-
-  .invoice-details.table-sm th, .invoice-details.table-sm td,
-  .invoice-summary.table-sm td, .invoice-summary.table-sm th {
-    padding: 0.3rem !important;
-    vertical-align: middle;
   }
 
   @media print {
@@ -77,8 +52,7 @@
       top: 0;
       width: 100%;
     }
-    /* Hide buttons and other elements within invoice not needed for print if desired */
-    .download-btn, .share-btn, .print-btn {
+    .download-btn, .share-btn, .print-btn, .back-btn {
       display: none !important;
     }
   }
@@ -88,138 +62,146 @@
 
 <script>
 // Set this to true for testing mode.
-const TEST_MODE = true;
+const TEST_MODE = false;
 </script>
 
-<h1 class="mb-4">Invoice Generator</h1>
-<div class="container">
-  <div class="row">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">InvoiceGen</a>
+  </div>
+</nav>
+
+<div class="container my-4">
+  <h1 class="mb-4 text-center fw-bold">Invoice Generator</h1>
+  <div class="row g-4">
     <!-- Form Section -->
-    <div class="col-12 col-lg-5 mb-4">
-      <div class="card p-3">
-        <h2 class="h4">Input Details</h2>
-        <div class="form-group">
-          <label for="startDate">Journey Start Date</label>
-          <input type="date" class="form-control" id="startDate" />
-        </div>
-        <div class="form-group">
-          <label for="startMeter">Journey Start Meter Reading (KM)</label>
-          <input type="number" class="form-control" id="startMeter" placeholder="e.g. 1200" />
-        </div>
-        <div class="form-group">
-          <label for="endDate">Journey End Date</label>
-          <input type="date" class="form-control" id="endDate" />
-        </div>
-        <div class="form-group">
-          <label for="endMeter">Journey End Meter Reading (KM)</label>
-          <input type="number" class="form-control" id="endMeter" placeholder="e.g. 1480" />
-        </div>
-        <div class="form-group">
-          <label for="toll">Toll Charges</label>
-          <input type="number" step="0.01" class="form-control" id="toll" placeholder="e.g. 45.00" />
-        </div>
-        <div class="form-group">
-          <label for="extras">Extra Expenses</label>
-          <input type="number" step="0.01" class="form-control" id="extras" placeholder="e.g. 100.00" />
-        </div>
-        <div class="form-group">
-          <label for="costPerKm">Cost per KM</label>
-          <input type="number" step="0.01" class="form-control" id="costPerKm" placeholder="e.g. 5.00" />
-        </div>
-        <div class="mt-3">
-          <button class="btn btn-primary" id="generateBtn">Generate Invoice</button>
+    <div class="col-12 col-lg-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h2 class="h5 mb-4">Input Details</h2>
+          <div class="mb-3">
+            <label for="startDate" class="form-label">Journey Start Date</label>
+            <input type="date" class="form-control" id="startDate" />
+          </div>
+          <div class="mb-3">
+            <label for="startMeter" class="form-label">Journey Start Meter Reading (KM)</label>
+            <input type="number" class="form-control" id="startMeter" placeholder="e.g. 1200" />
+          </div>
+          <div class="mb-3">
+            <label for="endDate" class="form-label">Journey End Date</label>
+            <input type="date" class="form-control" id="endDate" />
+          </div>
+          <div class="mb-3">
+            <label for="endMeter" class="form-label">Journey End Meter Reading (KM)</label>
+            <input type="number" class="form-control" id="endMeter" placeholder="e.g. 1480" />
+          </div>
+          <div class="mb-3">
+            <label for="toll" class="form-label">Toll Charges</label>
+            <input type="number" step="0.01" class="form-control" id="toll" placeholder="e.g. 45.00" />
+          </div>
+          <div class="mb-3">
+            <label for="extras" class="form-label">Extra Expenses</label>
+            <input type="number" step="0.01" class="form-control" id="extras" placeholder="e.g. 100.00" />
+          </div>
+          <div class="mb-3">
+            <label for="costPerKm" class="form-label">Cost per KM</label>
+            <input type="number" step="0.01" class="form-control" id="costPerKm" placeholder="e.g. 5.00" />
+          </div>
+          <button class="btn btn-primary w-100" id="generateBtn">Generate Invoice</button>
         </div>
       </div>
     </div>
 
     <!-- Invoice Section -->
-    <div class="col-12 col-lg-7 mb-4">
-      <div class="card p-3">
-        <h2 class="h4">Invoice Preview</h2>
-        <div id="invoice" class="invoice-container d-none">
-          <div class="invoice-header d-flex justify-content-between align-items-center mb-3">
-            <div class="invoice-company">
-              <h2 class="h5">ABC Travels</h2>
-              <p class="mb-0">Preeti Nagar,<br/> Lucknow, India</p>
+    <div class="col-12 col-lg-7">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h2 class="h5 mb-4">Invoice Preview</h2>
+          <div id="invoice" class="invoice-container d-none">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
+              <div>
+                <h3 class="h6 fw-bold">ABC Travels</h3>
+                <p class="mb-0 text-muted">Preeti Nagar,<br/>Lucknow, India</p>
+              </div>
+              <div class="invoice-logo">
+                <img src="https://raw.githubusercontent.com/easylauncher/assets/refs/heads/main/logo/EasyLauncherLogo02/LogoWithoutText/logo02.svg" alt="Company Logo" crossorigin="anonymous">
+              </div>
             </div>
-            <div class="invoice-logo">
-              <img src="https://raw.githubusercontent.com/easylauncher/assets/refs/heads/main/logo/EasyLauncherLogo02/LogoWithoutText/logo02.svg" alt="Company Logo" crossorigin="anonymous">
+
+            <div class="mb-4">
+              <h4 class="h6 fw-bold">Invoice Details</h4>
+              <table class="table table-sm table-striped table-borderless">
+                <thead class="table-light">
+                  <tr>
+                    <th>Journey Start Date</th>
+                    <th>Journey End Date</th>
+                    <th>Distance Covered (KM)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td id="displayStartDate"></td>
+                    <td id="displayEndDate"></td>
+                    <td id="displayDistance"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mb-4">
+              <h4 class="h6 fw-bold">Cost Summary</h4>
+              <table class="table table-sm table-borderless w-auto ms-auto text-end">
+                <tbody>
+                  <tr>
+                    <td class="fw-semibold">Cost per KM:</td>
+                    <td id="displayCostPerKm"></td>
+                  </tr>
+                  <tr>
+                    <td class="fw-semibold">Toll:</td>
+                    <td id="displayToll"></td>
+                  </tr>
+                  <tr>
+                    <td class="fw-semibold">Extra Expenses:</td>
+                    <td id="displayExtras"></td>
+                  </tr>
+                  <tr class="border-top">
+                    <td class="fw-bold">Total Cost:</td>
+                    <td id="displayTotal"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="text-end mt-3">
+              <p class="mb-0">Thank you for using our service!</p>
             </div>
           </div>
 
-          <div class="invoice-details mb-3">
-            <h3 class="h6">Invoice Details</h3>
-            <table class="table table-bordered table-sm">
-              <thead>
-                <tr>
-                  <th>Journey Start Date</th>
-                  <th>Journey End Date</th>
-                  <th>Distance Covered (KM)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td id="displayStartDate"></td>
-                  <td id="displayEndDate"></td>
-                  <td id="displayDistance"></td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- Action Buttons -->
+          <div class="download-btn text-center mt-4 d-none">
+            <button id="downloadPdf" class="btn btn-success me-2">Download as PDF</button>
+            <button id="shareInvoice" class="btn btn-success me-2">Share Invoice</button>
+            <button id="printInvoice" class="btn btn-outline-primary">Print Invoice</button>
           </div>
-
-          <div class="invoice-summary mb-3">
-            <h3 class="h6">Cost Summary</h3>
-            <table class="table table-bordered table-sm w-auto ml-auto">
-              <tbody>
-                <tr>
-                  <td><strong>Cost per KM:</strong></td>
-                  <td id="displayCostPerKm"></td>
-                </tr>
-                <tr>
-                  <td><strong>Toll:</strong></td>
-                  <td id="displayToll"></td>
-                </tr>
-                <tr>
-                  <td><strong>Extra Expenses:</strong></td>
-                  <td id="displayExtras"></td>
-                </tr>
-                <tr>
-                  <td><strong>Total Cost:</strong></td>
-                  <td id="displayTotal"></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="invoice-footer text-right">
-            <p>Thank you for using our service!</p>
-          </div>
-        </div>
-        <div class="download-btn text-center mt-3 d-none">
-          <button id="downloadPdf" class="btn">Download as PDF</button>
-        </div>
-        <div class="share-btn text-center mt-3 d-none">
-          <button id="shareInvoice" class="btn">Share Invoice</button>
-        </div>
-        <!-- Print Button -->
-        <div class="print-btn text-center mt-3 d-none">
-          <button id="printInvoice" class="btn">Print Invoice</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Include html2canvas and jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Required JS -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-7XuMYTRHcXyMN1c6MfJsc8ZaaTHr3fu4mxAw/knKA/zUwi3jHnuD32roP9cl/c2BOxGWDFbWs5n+ZLqz2tGdmg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" referrerpolicy="no-referrer"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-BuZV0Wno7SqfZkHDZT/N+7SwMkMyNPRnsHFKgu4pBaetWPgnablNGP0Z26G7NkfWJ+lnx9Pf3I7+QI6+tWjk4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" referrerpolicy="no-referrer"></script>
 
 <script>
   const generateBtn = document.getElementById('generateBtn');
   const invoiceEl = document.getElementById('invoice');
   const downloadPdfBtn = document.getElementById('downloadPdf');
   const shareBtn = document.getElementById('shareInvoice');
-  const printBtnContainer = document.querySelector('.print-btn');
+  const printInvoiceBtn = document.getElementById('printInvoice');
 
   // If TEST_MODE is true, populate form with sample values on load
   document.addEventListener('DOMContentLoaded', () => {
@@ -268,25 +250,17 @@ const TEST_MODE = true;
 
     invoiceEl.classList.remove('d-none');
     document.querySelector('.download-btn').classList.remove('d-none');
-    document.querySelector('.share-btn').classList.remove('d-none');
-    printBtnContainer.classList.remove('d-none');
   });
 
   downloadPdfBtn.addEventListener('click', async () => {
-    const jsPDF = window.jspdf.jsPDF;
+    const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'pt', 'a4');
 
-    await new Promise(res => setTimeout(res, 500));
+    // Short delay to ensure images/fonts are loaded
+    await new Promise(res => setTimeout(res, 300));
 
     const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-
-    const fileName = `invoice_${year}-${month}-${day}-${hours}-${minutes}-${seconds}.pdf`;
+    const fileName = `invoice_${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}-${String(now.getSeconds()).padStart(2,'0')}.pdf`;
 
     await pdf.html(invoiceEl, {
       callback: function (pdf) {
@@ -296,7 +270,7 @@ const TEST_MODE = true;
       x: 10,
       y: 10,
       html2canvas: {
-        useCORS: true, // Allow cross-origin images
+        useCORS: true,
         scale: 2
       }
     });
@@ -306,7 +280,7 @@ const TEST_MODE = true;
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'pt', 'a4');
 
-    await new Promise(res => setTimeout(res, 500));
+    await new Promise(res => setTimeout(res, 300));
 
     await pdf.html(invoiceEl, {
       autoPaging: true,
@@ -332,18 +306,17 @@ const TEST_MODE = true;
         alert('Sharing was cancelled or failed.');
       }
     } else {
-      alert("Sharing is not supported on this device/browser. Please download the PDF and share manually.");
+      alert("Sharing not supported. Please download the PDF and share manually.");
     }
   });
 
-  // Print invoice
-  document.getElementById('printInvoice').addEventListener('click', () => {
+  printInvoiceBtn.addEventListener('click', () => {
     window.print();
   });
 </script>
 
-<!-- Optional Bootstrap JS (if needed) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Bootstrap 5 JS (no jQuery needed) -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-vSgHbZd2J+M/987XN1mFA/umBI/4R4kJQX4+2ocLjCl7C+ZEx3ABGWhTg2CxmDI" crossorigin="anonymous"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"  crossorigin="anonymous"></script>
 </body>
 </html>
