@@ -38,10 +38,10 @@
 
   @media print {
     /* Hide everything except the invoice */
-    /* body * {
+    body * {
       visibility: hidden;
-      display: none !important;
-    } */
+      /* display: none !important; */
+    }
     #user_section, #user_section * {
       visibility: hidden;
       display: none !important;
@@ -57,7 +57,7 @@
       top: 0;
       width: 100%;
     }
-    #title, .download-btn, .share-btn, .print-btn, .back-btn {
+    #title, .download-btn, .share-btn, .print-btn, .back-btn, footer {
       display: none !important;
     }
   }
@@ -68,7 +68,7 @@
 
 <script>
 // Set this to true for testing mode.
-const TEST_MODE = true;
+const TEST_MODE = false;
 </script>
 
 <!-- Navbar -->
