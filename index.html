@@ -45,21 +45,42 @@
     object-fit: contain;
   }
   .download-btn button,
-  .share-btn button {
+  .share-btn button,
+  .print-btn button {
     background: #28a745;
     border: none;
     color: #fff;
   }
   .download-btn button:hover,
-  .share-btn button:hover {
+  .share-btn button:hover,
+  .print-btn button:hover {
     background: #218838;
   }
 
-  /* Reduce table padding even more */
   .invoice-details.table-sm th, .invoice-details.table-sm td,
   .invoice-summary.table-sm td, .invoice-summary.table-sm th {
     padding: 0.3rem !important;
     vertical-align: middle;
+  }
+
+  @media print {
+    /* Hide everything except the invoice */
+    body * {
+      visibility: hidden;
+    }
+    #invoice, #invoice * {
+      visibility: visible;
+    }
+    #invoice {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+    /* Hide buttons and other elements within invoice not needed for print if desired */
+    .download-btn, .share-btn, .print-btn {
+      display: none !important;
+    }
   }
 </style>
 </head>
@@ -180,6 +201,10 @@ const TEST_MODE = true;
         <div class="share-btn text-center mt-3 d-none">
           <button id="shareInvoice" class="btn">Share Invoice</button>
         </div>
+        <!-- Print Button -->
+        <div class="print-btn text-center mt-3 d-none">
+          <button id="printInvoice" class="btn">Print Invoice</button>
+        </div>
       </div>
     </div>
   </div>
@@ -194,6 +219,7 @@ const TEST_MODE = true;
   const invoiceEl = document.getElementById('invoice');
   const downloadPdfBtn = document.getElementById('downloadPdf');
   const shareBtn = document.getElementById('shareInvoice');
+  const printBtnContainer = document.querySelector('.print-btn');
 
   // If TEST_MODE is true, populate form with sample values on load
   document.addEventListener('DOMContentLoaded', () => {
@@ -243,13 +269,13 @@ const TEST_MODE = true;
     invoiceEl.classList.remove('d-none');
     document.querySelector('.download-btn').classList.remove('d-none');
     document.querySelector('.share-btn').classList.remove('d-none');
+    printBtnContainer.classList.remove('d-none');
   });
 
   downloadPdfBtn.addEventListener('click', async () => {
     const jsPDF = window.jspdf.jsPDF;
     const pdf = new jsPDF('p', 'pt', 'a4');
 
-    // Short delay to ensure images/fonts are loaded
     await new Promise(res => setTimeout(res, 500));
 
     const now = new Date();
@@ -308,6 +334,11 @@ const TEST_MODE = true;
     } else {
       alert("Sharing is not supported on this device/browser. Please download the PDF and share manually.");
     }
+  });
+
+  // Print invoice
+  document.getElementById('printInvoice').addEventListener('click', () => {
+    window.print();
   });
 </script>
 
