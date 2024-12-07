@@ -1,166 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Generator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-        .button {
-            padding: 10px 15px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-        #invoice-output {
-            margin-top: 20px;
-            padding: 20px;
-            background: #fafafa;
-            border: 1px solid #ddd;
-        }
-        #invoice {
-            font-size: 16px;
-            line-height: 1.5;
-        }
-        #invoice h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<!-- Professional Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link 
+  href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" 
+  rel="stylesheet"
+/>
+
+<title>Invoice Generator</title>
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    margin: 20px;
+    background: #f9f9f9;
+  }
+
+  h1, h2 {
+    color: #333;
+  }
+
+  .container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .form-section, .invoice-section {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 20px;
+    flex: 1;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    min-width: 300px;
+  }
+
+  .form-section h2 {
+    margin-top: 0;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  .form-group input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .buttons button {
+    padding: 10px 15px;
+    background: #0066cc;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .buttons button:hover {
+    background: #0055a3;
+  }
+
+  /* Invoice styling */
+  #invoice {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+
+  .invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .invoice-header img {
+    max-height: 50px;
+  }
+
+  .invoice-details, .invoice-summary {
+    margin-top: 20px;
+  }
+
+  .invoice-details table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .invoice-details th, .invoice-details td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+  .invoice-details th {
+    background: #f0f0f0;
+    text-align: left;
+  }
+
+  .invoice-summary table {
+    float: right;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .invoice-summary td {
+    padding: 5px 10px;
+  }
+
+  .invoice-summary tr:nth-child(1) td {
+    font-weight: bold;
+  }
+
+  .invoice-summary tr:last-child td {
+    font-weight: bold;
+    border-top: 2px solid #000;
+  }
+
+  .invoice-footer {
+    margin-top: 20px;
+    text-align: right;
+  }
+
+  .download-btn, .share-btn {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .download-btn button,
+  .share-btn button {
+    background: #28a745;
+  }
+
+  .download-btn button:hover,
+  .share-btn button:hover {
+    background: #218838;
+  }
+
+  .invoice-logo img {
+    width: 200px;
+    max-height: 200px;
+    object-fit: contain; /* Ensures proper aspect ratio if needed */
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Invoice Generator</h1>
-        <div class="form-group">
-            <label for="startDate">Journey Start Date</label>
-            <input type="date" id="startDate">
-        </div>
-        <div class="form-group">
-            <label for="startReading">Journey Start Meter Reading (KM)</label>
-            <input type="number" id="startReading" placeholder="Enter start reading">
-        </div>
-        <div class="form-group">
-            <label for="endDate">Journey End Date</label>
-            <input type="date" id="endDate">
-        </div>
-        <div class="form-group">
-            <label for="endReading">Journey End Meter Reading (KM)</label>
-            <input type="number" id="endReading" placeholder="Enter end reading">
-        </div>
-        <div class="form-group">
-            <label for="toll">Toll Charges</label>
-            <input type="number" id="toll" placeholder="Enter toll charges">
-        </div>
-        <div class="form-group">
-            <label for="expenses">Extra Expenses</label>
-            <input type="number" id="expenses" placeholder="Enter extra expenses">
-        </div>
-        <div class="form-group">
-            <label for="costPerKm">Cost Per KM</label>
-            <input type="number" id="costPerKm" placeholder="Enter cost per KM">
-        </div>
-        <button class="button" onclick="generateInvoice()">Generate Invoice</button>
 
-        <div id="invoice-output">
-            <div id="invoice"></div>
-        </div>
+<script>
+// Set this to true for testing mode.
+const TEST_MODE = true;
+</script>
+
+<h1>Invoice Generator</h1>
+<div class="container">
+  <div class="form-section">
+    <h2>Input Details</h2>
+    <div class="form-group">
+      <label for="startDate">Journey Start Date</label>
+      <input type="date" id="startDate" />
     </div>
+    <div class="form-group">
+      <label for="startMeter">Journey Start Meter Reading (KM)</label>
+      <input type="number" id="startMeter" placeholder="e.g. 1200" />
+    </div>
+    <div class="form-group">
+      <label for="endDate">Journey End Date</label>
+      <input type="date" id="endDate" />
+    </div>
+    <div class="form-group">
+      <label for="endMeter">Journey End Meter Reading (KM)</label>
+      <input type="number" id="endMeter" placeholder="e.g. 1480" />
+    </div>
+    <div class="form-group">
+      <label for="toll">Toll Charges</label>
+      <input type="number" step="0.01" id="toll" placeholder="e.g. 45.00" />
+    </div>
+    <div class="form-group">
+      <label for="extras">Extra Expenses</label>
+      <input type="number" step="0.01" id="extras" placeholder="e.g. 100.00" />
+    </div>
+    <div class="form-group">
+      <label for="costPerKm">Cost per KM</label>
+      <input type="number" step="0.01" id="costPerKm" placeholder="e.g. 5.00" />
+    </div>
+    <div class="buttons">
+      <button id="generateBtn">Generate Invoice</button>
+    </div>
+  </div>
 
-    <script>
-        function generateInvoice() {
-            const startDate = document.getElementById('startDate').value;
-            const startReading = parseFloat(document.getElementById('startReading').value);
-            const endDate = document.getElementById('endDate').value;
-            const endReading = parseFloat(document.getElementById('endReading').value);
-            const toll = parseFloat(document.getElementById('toll').value);
-            const expenses = parseFloat(document.getElementById('expenses').value);
-            const costPerKm = parseFloat(document.getElementById('costPerKm').value);
+  <div class="invoice-section">
+    <h2>Invoice Preview</h2>
+    <div id="invoice" style="display:none;">
+      <div class="invoice-header">
+        <div class="invoice-company">
+          <h2>ABC Travels</h2>
+          <p>Preeti Nagar,<br/> Lucknow, India</p>
+        </div>
+        <div class="invoice-logo">
+          <img src="https://raw.githubusercontent.com/easylauncher/assets/refs/heads/main/logo/EasyLauncherLogo02/LogoWithoutText/logo02.svg" alt="Company Logo">
+        </div>
+      </div>
 
-            const distance = endReading - startReading;
-            const travelCost = distance * costPerKm;
-            const totalCost = travelCost + toll + expenses;
+      <div class="invoice-details">
+        <h3>Invoice Details</h3>
+        <table>
+          <tr>
+            <th>Journey Start Date</th>
+            <th>Journey End Date</th>
+            <th>Distance Covered (KM)</th>
+          </tr>
+          <tr>
+            <td id="displayStartDate"></td>
+            <td id="displayEndDate"></td>
+            <td id="displayDistance"></td>
+          </tr>
+        </table>
+      </div>
 
-            const invoiceHtml = `
-                <h2>Professional Invoice</h2>
-                <p><strong>Invoice Number:</strong> ${Math.floor(Math.random() * 1000000)}</p>
-                <p><strong>Issue Date:</strong> ${new Date().toISOString().split('T')[0]}</p>
-                <hr>
-                <p><strong>Journey Start Date:</strong> ${startDate}</p>
-                <p><strong>Journey End Date:</strong> ${endDate}</p>
-                <p><strong>Start Meter Reading:</strong> ${startReading} KM</p>
-                <p><strong>End Meter Reading:</strong> ${endReading} KM</p>
-                <p><strong>Distance Travelled:</strong> ${distance} KM</p>
-                <p><strong>Cost Per KM:</strong> ₹${costPerKm.toFixed(2)}</p>
-                <p><strong>Travel Cost:</strong> ₹${travelCost.toFixed(2)}</p>
-                <p><strong>Toll Charges:</strong> ₹${toll.toFixed(2)}</p>
-                <p><strong>Extra Expenses:</strong> ₹${expenses.toFixed(2)}</p>
-                <hr>
-                <p><strong>Total Cost:</strong> ₹${totalCost.toFixed(2)}</p>
-                <hr>
-                <p>Thank you for your business!</p>
-            `;
+      <div class="invoice-summary">
+        <h3>Cost Summary</h3>
+        <table>
+          <tr>
+            <td>Cost per KM:</td>
+            <td id="displayCostPerKm"></td>
+          </tr>
+          <tr>
+            <td>Toll:</td>
+            <td id="displayToll"></td>
+          </tr>
+          <tr>
+            <td>Extra Expenses:</td>
+            <td id="displayExtras"></td>
+          </tr>
+          <tr>
+            <td>Total Cost:</td>
+            <td id="displayTotal"></td>
+          </tr>
+        </table>
+      </div>
 
-            const invoiceDiv = document.getElementById('invoice');
-            invoiceDiv.innerHTML = invoiceHtml;
+      <div class="invoice-footer">
+        <p>Thank you for using our service!</p>
+      </div>
+    </div>
+    <div class="download-btn" style="display:none;">
+      <button id="downloadPdf">Download as PDF</button>
+    </div>
+    <div class="share-btn" style="display:none;">
+      <button id="shareInvoice">Share Invoice</button>
+    </div>
+  </div>
+</div>
 
-            downloadPDF(startDate, endDate, distance, travelCost, toll, expenses, totalCost);
-        }
+<!-- Include jsPDF from CDN -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-T/jni5Mn+ScyCni5XeFp8bMOPUQhCDl4FA4PW1XzcaT5xacPqf9k0dJdN5S6WevjxrfdSaSK5VHX1TFtB8Y0Jg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
 
-        function downloadPDF(startDate, endDate, distance, travelCost, toll, expenses, totalCost) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-NX8DI3k6my5dUAWypiXs6QyA5sOEsyXjkoOnePos4yNj5EL208o5rOPeTwt1fbPuc0buAkWyp+dH8MZcjh9Uww==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
 
-            doc.setFontSize(16);
-            doc.text("Professional Invoice", 105, 10, { align: "center" });
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-            doc.setFontSize(12);
-            doc.text(`Invoice Number: ${Math.floor(Math.random() * 1000000)}`, 10, 20);
-            doc.text(`Issue Date: ${new Date().toISOString().split('T')[0]}`, 10, 30);
-            doc.text(`Journey Start Date: ${startDate}`, 10, 40);
-            doc.text(`Journey End Date: ${endDate}`, 10, 50);
-            doc.text(`Distance Travelled: ${distance} KM`, 10, 60);
-            doc.text(`Cost Per KM: ₹${costPerKm.toFixed(2)}`, 10, 70);
-            doc.text(`Travel Cost: ₹${travelCost.toFixed(2)}`, 10, 80);
-            doc.text(`Toll Charges: ₹${toll.toFixed(2)}`, 10, 90);
-            doc.text(`Extra Expenses: ₹${expenses.toFixed(2)}`, 10, 100);
-            doc.text(`Total Cost: ₹${totalCost.toFixed(2)}`, 10, 110);
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-            doc.setFontSize(14);
-            doc.text("Thank you for your business!", 10, 130);
 
-            doc.save("Professional_Invoice.pdf");
-        }
-    </script>
+
+<script>
+  const generateBtn = document.getElementById('generateBtn');
+  const invoiceEl = document.getElementById('invoice');
+  const downloadPdfBtn = document.getElementById('downloadPdf');
+  const shareBtn = document.getElementById('shareInvoice');
+
+  // If TEST_MODE is true, populate form with sample values on load
+  document.addEventListener('DOMContentLoaded', () => {
+    if (TEST_MODE) {
+      document.getElementById('startDate').value = '2024-12-01';
+      document.getElementById('startMeter').value = '1200';
+      document.getElementById('endDate').value = '2024-12-02';
+      document.getElementById('endMeter').value = '1480';
+      document.getElementById('toll').value = '150';
+      document.getElementById('extras').value = '100';
+      document.getElementById('costPerKm').value = '11';
+    }
+  });
+
+  generateBtn.addEventListener('click', () => {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const startMeter = parseFloat(document.getElementById('startMeter').value);
+    const endMeter = parseFloat(document.getElementById('endMeter').value);
+    const toll = parseFloat(document.getElementById('toll').value) || 0;
+    const extras = parseFloat(document.getElementById('extras').value) || 0;
+    const costPerKm = parseFloat(document.getElementById('costPerKm').value);
+
+    if(!startDate || !endDate || isNaN(startMeter) || isNaN(endMeter) || isNaN(costPerKm)) {
+      alert('Please fill in all required fields properly.');
+      return;
+    }
+
+    const distance = endMeter - startMeter;
+    if(distance < 0) {
+      alert('End meter reading should be greater than or equal to start meter reading.');
+      return;
+    }
+
+    const travelCost = distance * costPerKm;
+    const totalCost = travelCost + toll + extras;
+
+    // Populate invoice fields
+    document.getElementById('displayStartDate').textContent = startDate;
+    document.getElementById('displayEndDate').textContent = endDate;
+    document.getElementById('displayDistance').textContent = distance.toFixed(2) + ' KM';
+    document.getElementById('displayCostPerKm').textContent = costPerKm.toFixed(2);
+    document.getElementById('displayToll').textContent = toll.toFixed(2);
+    document.getElementById('displayExtras').textContent = extras.toFixed(2);
+    document.getElementById('displayTotal').textContent = totalCost.toFixed(2);
+
+    invoiceEl.style.display = 'block';
+    document.querySelector('.download-btn').style.display = 'block';
+    document.querySelector('.share-btn').style.display = 'block';
+  });
+
+  downloadPdfBtn.addEventListener('click', async () => {
+    // const { jsPDF } = window.jspdf;
+    
+    const jsPDF = window.jspdf.jsPDF;
+
+    const pdf = new jsPDF('p', 'pt', 'a4');
+
+      // Generate a timestamp-based filename
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+
+      const fileName = `invoice_${year}-${month}-${day}-${hours}-${minutes}-${seconds}.pdf`;
+
+
+    await pdf.html(invoiceEl, {
+      callback: function (pdf) {
+
+        pdf.save(fileName);
+      },
+      autoPaging: true,
+      x: 10,
+      y: 10
+    });
+  });
+
+  shareBtn.addEventListener('click', async () => {
+    // Generate PDF as blob for sharing
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'pt', 'a4');
+
+    await pdf.html(invoiceEl, {
+      autoPaging: true,
+      x: 10,
+      y: 10
+    });
+
+    const blob = pdf.output('blob');
+    const file = new File([blob], "invoice.pdf", {type:'application/pdf'});
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          title: 'Invoice',
+          text: 'Please find attached your invoice.',
+          files: [file]
+        });
+      } catch (err) {
+        alert('Sharing was cancelled or failed.');
+      }
+    } else {
+      alert("Sharing is not supported on this device/browser. Please download the PDF and share manually.");
+    }
+  });
+</script>
 </body>
 </html>
