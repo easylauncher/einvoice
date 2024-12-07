@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<!-- Include a professional font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link 
+  href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" 
+  rel="stylesheet"
+/>
+
+<title>Invoice Generator</title>
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    margin: 20px;
+    background: #f9f9f9;
+  }
+
+  h1, h2 {
+    color: #333;
+  }
+
+  .container {
+    display: flex;
+    gap: 20px;
+  }
+
+  .form-section, .invoice-section {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 20px;
+    flex: 1;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+
+  .form-section h2 {
+    margin-top: 0;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  .form-group input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .buttons button {
+    padding: 10px 15px;
+    background: #0066cc;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .buttons button:hover {
+    background: #0055a3;
+  }
+
+  /* Invoice styling */
+  #invoice {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+
+  .invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .invoice-header img {
+    max-height: 50px;
+  }
+
+  .invoice-details, .invoice-summary {
+    margin-top: 20px;
+  }
+
+  .invoice-details table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .invoice-details th, .invoice-details td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+  .invoice-details th {
+    background: #f0f0f0;
+    text-align: left;
+  }
+
+  .invoice-footer {
+    margin-top: 20px;
+    text-align: right;
+  }
+
+  .invoice-summary table {
+    float: right;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .invoice-summary td {
+    padding: 5px 10px;
+  }
+
+  .invoice-summary tr:nth-child(1) td {
+    font-weight: bold;
+  }
+
+  .download-btn {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .download-btn button {
+    background: #28a745;
+  }
+
+  .download-btn button:hover {
+    background: #218838;
+  }
+</style>
+</head>
+<body>
+
+<h1>Invoice Generator</h1>
+<div class="container">
+  <div class="form-section">
+    <h2>Input Details</h2>
+    <div class="form-group">
+      <label for="startDate">Journey Start Date</label>
+      <input type="date" id="startDate" />
+    </div>
+    <div class="form-group">
+      <label for="startMeter">Journey Start Meter Reading (KM)</label>
+      <input type="number" id="startMeter" placeholder="e.g. 1200" />
+    </div>
+    <div class="form-group">
+      <label for="endDate">Journey End Date</label>
+      <input type="date" id="endDate" />
+    </div>
+    <div class="form-group">
+      <label for="endMeter">Journey End Meter Reading (KM)</label>
+      <input type="number" id="endMeter" placeholder="e.g. 1480" />
+    </div>
+    <div class="form-group">
+      <label for="toll">Toll Charges</label>
+      <input type="number" step="0.01" id="toll" placeholder="e.g. 45.00" />
+    </div>
+    <div class="form-group">
+      <label for="extras">Extra Expenses</label>
+      <input type="number" step="0.01" id="extras" placeholder="e.g. 100.00" />
+    </div>
+    <div class="form-group">
+      <label for="costPerKm">Cost per KM</label>
+      <input type="number" step="0.01" id="costPerKm" placeholder="e.g. 5.00" />
+    </div>
+    <div class="buttons">
+      <button id="generateBtn">Generate Invoice</button>
+    </div>
+  </div>
+
+  <div class="invoice-section">
+    <h2>Invoice Preview</h2>
+    <div id="invoice" style="display:none;">
+      <div class="invoice-header">
+        <div class="invoice-company">
+          <h2>My Travel Co.</h2>
+          <p>123 Main Street,<br/> City, Country</p>
+        </div>
+        <div class="invoice-logo">
+          <img src="https://via.placeholder.com/100x50?text=LOGO" alt="Company Logo">
+        </div>
+      </div>
+
+      <div class="invoice-details">
+        <h3>Invoice Details</h3>
+        <table>
+          <tr>
+            <th>Journey Start Date</th>
+            <th>Journey End Date</th>
+            <th>Distance Covered (KM)</th>
+          </tr>
+          <tr>
+            <td id="displayStartDate"></td>
+            <td id="displayEndDate"></td>
+            <td id="displayDistance"></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="invoice-summary">
+        <h3>Cost Summary</h3>
+        <table>
+          <tr>
+            <td>Cost per KM:</td>
+            <td id="displayCostPerKm"></td>
+          </tr>
+          <tr>
+            <td>Toll:</td>
+            <td id="displayToll"></td>
+          </tr>
+          <tr>
+            <td>Extra Expenses:</td>
+            <td id="displayExtras"></td>
+          </tr>
+          <tr style="border-top:2px solid #000;font-weight:bold;">
+            <td>Total Cost:</td>
+            <td id="displayTotal"></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="invoice-footer">
+        <p>Thank you for using our service!</p>
+      </div>
+    </div>
+    <div class="download-btn" style="display:none;">
+      <button id="downloadPdf">Download as PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Include jsPDF and html2canvas from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-T/jni5Mn+ScyCni5XeFp8bMOPUQhCDl4FA4PW1XzcaT5xacPqf9k0dJdN5S6WevjxrfdSaSK5VHX1TFtB8Y0Jg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNa8e36zVAB0GwO7ldUe4/pPPVtnk69FQccXGabmx1v8aaHOKzKT4iXd3ISBo1xzCLDShfQJqP7QfM2qPzqm0g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+  const generateBtn = document.getElementById('generateBtn');
+  const invoiceEl = document.getElementById('invoice');
+  const downloadPdfBtn = document.getElementById('downloadPdf');
+
+  generateBtn.addEventListener('click', () => {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const startMeter = parseFloat(document.getElementById('startMeter').value);
+    const endMeter = parseFloat(document.getElementById('endMeter').value);
+    const toll = parseFloat(document.getElementById('toll').value) || 0;
+    const extras = parseFloat(document.getElementById('extras').value) || 0;
+    const costPerKm = parseFloat(document.getElementById('costPerKm').value);
+
+    if(!startDate || !endDate || isNaN(startMeter) || isNaN(endMeter) || isNaN(costPerKm)) {
+      alert('Please fill in all required fields properly.');
+      return;
+    }
+
+    const distance = endMeter - startMeter;
+    if(distance < 0) {
+      alert('End meter reading should be greater than or equal to start meter reading.');
+      return;
+    }
+
+    const travelCost = distance * costPerKm;
+    const totalCost = travelCost + toll + extras;
+
+    // Populate invoice fields
+    document.getElementById('displayStartDate').textContent = startDate;
+    document.getElementById('displayEndDate').textContent = endDate;
+    document.getElementById('displayDistance').textContent = distance.toFixed(2) + ' KM';
+    document.getElementById('displayCostPerKm').textContent = costPerKm.toFixed(2);
+    document.getElementById('displayToll').textContent = toll.toFixed(2);
+    document.getElementById('displayExtras').textContent = extras.toFixed(2);
+    document.getElementById('displayTotal').textContent = totalCost.toFixed(2);
+
+    invoiceEl.style.display = 'block';
+    document.querySelector('.download-btn').style.display = 'block';
+  });
+
+  downloadPdfBtn.addEventListener('click', () => {
+    const { jsPDF } = window.jspdf;
+    html2canvas(invoiceEl).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // Calculate aspect ratio to fit invoice into page
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / canvasWidth, pdfHeight / canvasHeight);
+      
+      const imgWidth = canvasWidth * ratio;
+      const imgHeight = canvasHeight * ratio;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save('invoice.pdf');
+    });
+  });
+</script>
+</body>
+</html>

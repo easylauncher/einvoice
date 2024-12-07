@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        #invoice-output {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fafafa;
+            border: 1px solid #ddd;
+        }
+        #invoice {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        #invoice h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Invoice Generator</h1>
+        <div class="form-group">
+            <label for="startDate">Journey Start Date</label>
+            <input type="date" id="startDate">
+        </div>
+        <div class="form-group">
+            <label for="startReading">Journey Start Meter Reading (KM)</label>
+            <input type="number" id="startReading" placeholder="Enter start reading">
+        </div>
+        <div class="form-group">
+            <label for="endDate">Journey End Date</label>
+            <input type="date" id="endDate">
+        </div>
+        <div class="form-group">
+            <label for="endReading">Journey End Meter Reading (KM)</label>
+            <input type="number" id="endReading" placeholder="Enter end reading">
+        </div>
+        <div class="form-group">
+            <label for="toll">Toll Charges</label>
+            <input type="number" id="toll" placeholder="Enter toll charges">
+        </div>
+        <div class="form-group">
+            <label for="expenses">Extra Expenses</label>
+            <input type="number" id="expenses" placeholder="Enter extra expenses">
+        </div>
+        <div class="form-group">
+            <label for="costPerKm">Cost Per KM</label>
+            <input type="number" id="costPerKm" placeholder="Enter cost per KM">
+        </div>
+        <button class="button" onclick="generateInvoice()">Generate Invoice</button>
+
+        <div id="invoice-output">
+            <div id="invoice"></div>
+        </div>
+    </div>
+
+    <script>
+        function generateInvoice() {
+            const startDate = document.getElementById('startDate').value;
+            const startReading = parseFloat(document.getElementById('startReading').value);
+            const endDate = document.getElementById('endDate').value;
+            const endReading = parseFloat(document.getElementById('endReading').value);
+            const toll = parseFloat(document.getElementById('toll').value);
+            const expenses = parseFloat(document.getElementById('expenses').value);
+            const costPerKm = parseFloat(document.getElementById('costPerKm').value);
+
+            const distance = endReading - startReading;
+            const travelCost = distance * costPerKm;
+            const totalCost = travelCost + toll + expenses;
+
+            const invoiceHtml = `
+                <h2>Professional Invoice</h2>
+                <p><strong>Invoice Number:</strong> ${Math.floor(Math.random() * 1000000)}</p>
+                <p><strong>Issue Date:</strong> ${new Date().toISOString().split('T')[0]}</p>
+                <hr>
+                <p><strong>Journey Start Date:</strong> ${startDate}</p>
+                <p><strong>Journey End Date:</strong> ${endDate}</p>
+                <p><strong>Start Meter Reading:</strong> ${startReading} KM</p>
+                <p><strong>End Meter Reading:</strong> ${endReading} KM</p>
+                <p><strong>Distance Travelled:</strong> ${distance} KM</p>
+                <p><strong>Cost Per KM:</strong> ₹${costPerKm.toFixed(2)}</p>
+                <p><strong>Travel Cost:</strong> ₹${travelCost.toFixed(2)}</p>
+                <p><strong>Toll Charges:</strong> ₹${toll.toFixed(2)}</p>
+                <p><strong>Extra Expenses:</strong> ₹${expenses.toFixed(2)}</p>
+                <hr>
+                <p><strong>Total Cost:</strong> ₹${totalCost.toFixed(2)}</p>
+                <hr>
+                <p>Thank you for your business!</p>
+            `;
+
+            const invoiceDiv = document.getElementById('invoice');
+            invoiceDiv.innerHTML = invoiceHtml;
+
+            downloadPDF(startDate, endDate, distance, travelCost, toll, expenses, totalCost);
+        }
+
+        function downloadPDF(startDate, endDate, distance, travelCost, toll, expenses, totalCost) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(16);
+            doc.text("Professional Invoice", 105, 10, { align: "center" });
+
+            doc.setFontSize(12);
+            doc.text(`Invoice Number: ${Math.floor(Math.random() * 1000000)}`, 10, 20);
+            doc.text(`Issue Date: ${new Date().toISOString().split('T')[0]}`, 10, 30);
+            doc.text(`Journey Start Date: ${startDate}`, 10, 40);
+            doc.text(`Journey End Date: ${endDate}`, 10, 50);
+            doc.text(`Distance Travelled: ${distance} KM`, 10, 60);
+            doc.text(`Cost Per KM: ₹${costPerKm.toFixed(2)}`, 10, 70);
+            doc.text(`Travel Cost: ₹${travelCost.toFixed(2)}`, 10, 80);
+            doc.text(`Toll Charges: ₹${toll.toFixed(2)}`, 10, 90);
+            doc.text(`Extra Expenses: ₹${expenses.toFixed(2)}`, 10, 100);
+            doc.text(`Total Cost: ₹${totalCost.toFixed(2)}`, 10, 110);
+
+            doc.setFontSize(14);
+            doc.text("Thank you for your business!", 10, 130);
+
+            doc.save("Professional_Invoice.pdf");
+        }
+    </script>
+</body>
+</html>
