@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
+<!-- Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
 <!-- Professional Font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,151 +22,44 @@
     margin: 20px;
     background: #f9f9f9;
   }
-
-  h1, h2 {
+  h1, h2, h3 {
     color: #333;
   }
-
-  .container {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-
-  .form-section, .invoice-section {
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 20px;
-    flex: 1;
+  .card {
     box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    min-width: 300px;
+    border-radius: 6px;
   }
-
-  .form-section h2 {
-    margin-top: 0;
-  }
-
-  .form-group {
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .form-group label {
-    margin-bottom: 5px;
-    font-weight: 500;
-  }
-
-  .form-group input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  .buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    flex-wrap: wrap;
-  }
-
-  .buttons button {
-    padding: 10px 15px;
-    background: #0066cc;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .buttons button:hover {
-    background: #0055a3;
-  }
-
-  /* Invoice styling */
-  #invoice {
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
+  .invoice-container {
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 0.9rem;
+    padding: 20px;
   }
-
-  .invoice-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
   .invoice-header img {
     max-height: 50px;
   }
-
-  .invoice-details, .invoice-summary {
-    margin-top: 20px;
+  .invoice-logo img {
+    width: 200px;
+    max-height: 200px;
+    object-fit: contain;
   }
-
-  .invoice-details table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .invoice-details th, .invoice-details td {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-
-  .invoice-details th {
-    background: #f0f0f0;
-    text-align: left;
-  }
-
-  .invoice-summary table {
-    float: right;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-
-  .invoice-summary td {
-    padding: 5px 10px;
-  }
-
-  .invoice-summary tr:nth-child(1) td {
-    font-weight: bold;
-  }
-
-  .invoice-summary tr:last-child td {
-    font-weight: bold;
-    border-top: 2px solid #000;
-  }
-
-  .invoice-footer {
-    margin-top: 20px;
-    text-align: right;
-  }
-
-  .download-btn, .share-btn {
-    text-align: center;
-    margin-top: 20px;
-  }
-
   .download-btn button,
   .share-btn button {
     background: #28a745;
+    border: none;
+    color: #fff;
   }
-
   .download-btn button:hover,
   .share-btn button:hover {
     background: #218838;
   }
 
-  .invoice-logo img {
-    width: 200px;
-    max-height: 200px;
-    object-fit: contain; /* Ensures proper aspect ratio if needed */
+  /* Reduce table padding even more */
+  .invoice-details.table-sm th, .invoice-details.table-sm td,
+  .invoice-summary.table-sm td, .invoice-summary.table-sm th {
+    padding: 0.3rem !important;
+    vertical-align: middle;
   }
 </style>
 </head>
@@ -174,117 +70,124 @@
 const TEST_MODE = true;
 </script>
 
-<h1>Invoice Generator</h1>
+<h1 class="mb-4">Invoice Generator</h1>
 <div class="container">
-  <div class="form-section">
-    <h2>Input Details</h2>
-    <div class="form-group">
-      <label for="startDate">Journey Start Date</label>
-      <input type="date" id="startDate" />
-    </div>
-    <div class="form-group">
-      <label for="startMeter">Journey Start Meter Reading (KM)</label>
-      <input type="number" id="startMeter" placeholder="e.g. 1200" />
-    </div>
-    <div class="form-group">
-      <label for="endDate">Journey End Date</label>
-      <input type="date" id="endDate" />
-    </div>
-    <div class="form-group">
-      <label for="endMeter">Journey End Meter Reading (KM)</label>
-      <input type="number" id="endMeter" placeholder="e.g. 1480" />
-    </div>
-    <div class="form-group">
-      <label for="toll">Toll Charges</label>
-      <input type="number" step="0.01" id="toll" placeholder="e.g. 45.00" />
-    </div>
-    <div class="form-group">
-      <label for="extras">Extra Expenses</label>
-      <input type="number" step="0.01" id="extras" placeholder="e.g. 100.00" />
-    </div>
-    <div class="form-group">
-      <label for="costPerKm">Cost per KM</label>
-      <input type="number" step="0.01" id="costPerKm" placeholder="e.g. 5.00" />
-    </div>
-    <div class="buttons">
-      <button id="generateBtn">Generate Invoice</button>
-    </div>
-  </div>
-
-  <div class="invoice-section">
-    <h2>Invoice Preview</h2>
-    <div id="invoice" style="display:none;">
-      <div class="invoice-header">
-        <div class="invoice-company">
-          <h2>ABC Travels</h2>
-          <p>Preeti Nagar,<br/> Lucknow, India</p>
+  <div class="row">
+    <!-- Form Section -->
+    <div class="col-12 col-lg-5 mb-4">
+      <div class="card p-3">
+        <h2 class="h4">Input Details</h2>
+        <div class="form-group">
+          <label for="startDate">Journey Start Date</label>
+          <input type="date" class="form-control" id="startDate" />
         </div>
-        <div class="invoice-logo">
-          <img src="https://raw.githubusercontent.com/easylauncher/assets/refs/heads/main/logo/EasyLauncherLogo02/LogoWithoutText/logo02.svg" alt="Company Logo">
+        <div class="form-group">
+          <label for="startMeter">Journey Start Meter Reading (KM)</label>
+          <input type="number" class="form-control" id="startMeter" placeholder="e.g. 1200" />
+        </div>
+        <div class="form-group">
+          <label for="endDate">Journey End Date</label>
+          <input type="date" class="form-control" id="endDate" />
+        </div>
+        <div class="form-group">
+          <label for="endMeter">Journey End Meter Reading (KM)</label>
+          <input type="number" class="form-control" id="endMeter" placeholder="e.g. 1480" />
+        </div>
+        <div class="form-group">
+          <label for="toll">Toll Charges</label>
+          <input type="number" step="0.01" class="form-control" id="toll" placeholder="e.g. 45.00" />
+        </div>
+        <div class="form-group">
+          <label for="extras">Extra Expenses</label>
+          <input type="number" step="0.01" class="form-control" id="extras" placeholder="e.g. 100.00" />
+        </div>
+        <div class="form-group">
+          <label for="costPerKm">Cost per KM</label>
+          <input type="number" step="0.01" class="form-control" id="costPerKm" placeholder="e.g. 5.00" />
+        </div>
+        <div class="mt-3">
+          <button class="btn btn-primary" id="generateBtn">Generate Invoice</button>
         </div>
       </div>
-
-      <div class="invoice-details">
-        <h3>Invoice Details</h3>
-        <table>
-          <tr>
-            <th>Journey Start Date</th>
-            <th>Journey End Date</th>
-            <th>Distance Covered (KM)</th>
-          </tr>
-          <tr>
-            <td id="displayStartDate"></td>
-            <td id="displayEndDate"></td>
-            <td id="displayDistance"></td>
-          </tr>
-        </table>
-      </div>
-
-      <div class="invoice-summary">
-        <h3>Cost Summary</h3>
-        <table>
-          <tr>
-            <td>Cost per KM:</td>
-            <td id="displayCostPerKm"></td>
-          </tr>
-          <tr>
-            <td>Toll:</td>
-            <td id="displayToll"></td>
-          </tr>
-          <tr>
-            <td>Extra Expenses:</td>
-            <td id="displayExtras"></td>
-          </tr>
-          <tr>
-            <td>Total Cost:</td>
-            <td id="displayTotal"></td>
-          </tr>
-        </table>
-      </div>
-
-      <div class="invoice-footer">
-        <p>Thank you for using our service!</p>
-      </div>
     </div>
-    <div class="download-btn" style="display:none;">
-      <button id="downloadPdf">Download as PDF</button>
-    </div>
-    <div class="share-btn" style="display:none;">
-      <button id="shareInvoice">Share Invoice</button>
+
+    <!-- Invoice Section -->
+    <div class="col-12 col-lg-7 mb-4">
+      <div class="card p-3">
+        <h2 class="h4">Invoice Preview</h2>
+        <div id="invoice" class="invoice-container d-none">
+          <div class="invoice-header d-flex justify-content-between align-items-center mb-3">
+            <div class="invoice-company">
+              <h2 class="h5">ABC Travels</h2>
+              <p class="mb-0">Preeti Nagar,<br/> Lucknow, India</p>
+            </div>
+            <div class="invoice-logo">
+              <img src="https://raw.githubusercontent.com/easylauncher/assets/refs/heads/main/logo/EasyLauncherLogo02/LogoWithoutText/logo02.svg" alt="Company Logo" crossorigin="anonymous">
+            </div>
+          </div>
+
+          <div class="invoice-details mb-3">
+            <h3 class="h6">Invoice Details</h3>
+            <table class="table table-bordered table-sm">
+              <thead>
+                <tr>
+                  <th>Journey Start Date</th>
+                  <th>Journey End Date</th>
+                  <th>Distance Covered (KM)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="displayStartDate"></td>
+                  <td id="displayEndDate"></td>
+                  <td id="displayDistance"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="invoice-summary mb-3">
+            <h3 class="h6">Cost Summary</h3>
+            <table class="table table-bordered table-sm w-auto ml-auto">
+              <tbody>
+                <tr>
+                  <td><strong>Cost per KM:</strong></td>
+                  <td id="displayCostPerKm"></td>
+                </tr>
+                <tr>
+                  <td><strong>Toll:</strong></td>
+                  <td id="displayToll"></td>
+                </tr>
+                <tr>
+                  <td><strong>Extra Expenses:</strong></td>
+                  <td id="displayExtras"></td>
+                </tr>
+                <tr>
+                  <td><strong>Total Cost:</strong></td>
+                  <td id="displayTotal"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="invoice-footer text-right">
+            <p>Thank you for using our service!</p>
+          </div>
+        </div>
+        <div class="download-btn text-center mt-3 d-none">
+          <button id="downloadPdf" class="btn">Download as PDF</button>
+        </div>
+        <div class="share-btn text-center mt-3 d-none">
+          <button id="shareInvoice" class="btn">Share Invoice</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Include jsPDF from CDN -->
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-T/jni5Mn+ScyCni5XeFp8bMOPUQhCDl4FA4PW1XzcaT5xacPqf9k0dJdN5S6WevjxrfdSaSK5VHX1TFtB8Y0Jg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
-
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-NX8DI3k6my5dUAWypiXs6QyA5sOEsyXjkoOnePos4yNj5EL208o5rOPeTwt1fbPuc0buAkWyp+dH8MZcjh9Uww==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
-
+<!-- Include html2canvas and jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-
 
 <script>
   const generateBtn = document.getElementById('generateBtn');
@@ -337,50 +240,56 @@ const TEST_MODE = true;
     document.getElementById('displayExtras').textContent = extras.toFixed(2);
     document.getElementById('displayTotal').textContent = totalCost.toFixed(2);
 
-    invoiceEl.style.display = 'block';
-    document.querySelector('.download-btn').style.display = 'block';
-    document.querySelector('.share-btn').style.display = 'block';
+    invoiceEl.classList.remove('d-none');
+    document.querySelector('.download-btn').classList.remove('d-none');
+    document.querySelector('.share-btn').classList.remove('d-none');
   });
 
   downloadPdfBtn.addEventListener('click', async () => {
-    // const { jsPDF } = window.jspdf;
-    
     const jsPDF = window.jspdf.jsPDF;
-
     const pdf = new jsPDF('p', 'pt', 'a4');
 
-      // Generate a timestamp-based filename
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const day = String(now.getDate()).padStart(2, '0');
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
+    // Short delay to ensure images/fonts are loaded
+    await new Promise(res => setTimeout(res, 500));
 
-      const fileName = `invoice_${year}-${month}-${day}-${hours}-${minutes}-${seconds}.pdf`;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
 
+    const fileName = `invoice_${year}-${month}-${day}-${hours}-${minutes}-${seconds}.pdf`;
 
     await pdf.html(invoiceEl, {
       callback: function (pdf) {
-
         pdf.save(fileName);
       },
       autoPaging: true,
       x: 10,
-      y: 10
+      y: 10,
+      html2canvas: {
+        useCORS: true, // Allow cross-origin images
+        scale: 2
+      }
     });
   });
 
   shareBtn.addEventListener('click', async () => {
-    // Generate PDF as blob for sharing
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p', 'pt', 'a4');
+
+    await new Promise(res => setTimeout(res, 500));
 
     await pdf.html(invoiceEl, {
       autoPaging: true,
       x: 10,
-      y: 10
+      y: 10,
+      html2canvas: {
+        useCORS: true,
+        scale: 2
+      }
     });
 
     const blob = pdf.output('blob');
@@ -401,5 +310,9 @@ const TEST_MODE = true;
     }
   });
 </script>
+
+<!-- Optional Bootstrap JS (if needed) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
