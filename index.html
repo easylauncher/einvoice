@@ -38,11 +38,18 @@
 
   @media print {
     /* Hide everything except the invoice */
-    body * {
+    /* body * {
       visibility: hidden;
+      display: none !important;
+    } */
+    #user_section, #user_section * {
+      visibility: hidden;
+      display: none !important;
     }
+
     #invoice, #invoice * {
       visibility: visible;
+      /* display: block !important; */
     }
     #invoice {
       position: absolute;
@@ -50,13 +57,14 @@
       top: 0;
       width: 100%;
     }
-    .download-btn, .share-btn, .print-btn, .back-btn {
+    #title, .download-btn, .share-btn, .print-btn, .back-btn {
       display: none !important;
     }
   }
 </style>
 </head>
 <body>
+
 
 <script>
 // Set this to true for testing mode.
@@ -71,10 +79,10 @@ const TEST_MODE = true;
 </nav>
 
 <div class="container my-4">
-  <h1 class="mb-4 text-center fw-bold">Invoice Generator</h1>
+  <h1 id="title" class="mb-4 text-center fw-bold">Invoice Generator</h1>
   <div class="row g-4">
     <!-- Form Section -->
-    <div class="col-12 col-lg-5">
+    <div id="user_section" class="col-12 col-lg-5">
       <div class="card border-0 shadow-sm">
         <div class="card-body">
           <h2 class="h5 mb-4">Input Details</h2>
@@ -174,20 +182,35 @@ const TEST_MODE = true;
             <div class="text-end mt-3">
               <p class="mb-0">Thank you for using our service!</p>
             </div>
+
+            <div class="text-center mt-4" style="font-size:0.8rem;">
+              &copy; EasyLauncher.net . All rights reserved.
+            </div>
+
           </div>
 
-          <!-- Action Buttons -->
+          <!-- Action Buttons Start -->
           <div class="download-btn text-center mt-4 d-none">
             <button id="downloadPdf" class="btn btn-success me-2">Download as PDF</button>
             <button id="shareInvoice" class="btn btn-success me-2">Share Invoice</button>
             <button id="printInvoice" class="btn btn-outline-primary">Print Invoice</button>
             <button type="button" class="btn btn-outline-primary">Primary</button>
           </div>
+          <!-- Action Buttons End -->
+          
         </div>
       </div>
+
     </div>
+    <!-- Invoice Section End -->
+
   </div>
 </div>
+
+<footer class="text-center py-3 mt-5" style="font-size:0.8rem; background: #f1f1f1;">
+  &copy; 2024 <a href="https://EasyLauncher.net" target="_blank" rel="noopener noreferrer">EasyLauncher.net</a>. All rights reserved.
+</footer>
+
 
 <!-- Required JS -->
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-7XuMYTRHcXyMN1c6MfJsc8ZaaTHr3fu4mxAw/knKA/zUwi3jHnuD32roP9cl/c2BOxGWDFbWs5n+ZLqz2tGdmg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
@@ -312,6 +335,8 @@ const TEST_MODE = true;
   printInvoiceBtn.addEventListener('click', () => {
     window.print();
   });
+  
+
 </script>
 
 <!-- Bootstrap 5 JS (no jQuery needed) -->
