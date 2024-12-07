@@ -68,7 +68,7 @@
 
 <script>
 // Set this to true for testing mode.
-const TEST_MODE = false;
+const TEST_MODE = true;
 </script>
 
 <!-- Navbar -->
@@ -125,6 +125,7 @@ const TEST_MODE = false;
         <div class="card-body">
           <h2 class="h5 mb-4">Invoice Preview</h2>
           <div id="invoice" class="invoice-container d-none">
+            <h4>Estimate</h4>
             <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
               <div>
                 <h3 class="h6 fw-bold">ABC Travels</h3>
@@ -136,7 +137,7 @@ const TEST_MODE = false;
             </div>
 
             <div class="mb-4">
-              <h4 class="h6 fw-bold">Invoice Details</h4>
+              <h4 class="h6 fw-bold">Journey Details</h4>
               <table class="table table-sm table-striped table-borderless">
                 <thead class="table-light">
                   <tr>
@@ -155,36 +156,59 @@ const TEST_MODE = false;
               </table>
             </div>
 
+            <!-- Cost Section Start -->
             <div class="mb-4">
-              <h4 class="h6 fw-bold">Cost Summary</h4>
-              <table class="table table-sm table-borderless w-auto ms-auto text-end">
+              <h4 class="h6 fw-bold">Invoice Details</h4>
+              <table class="table table-sm table-striped table-borderless">
+                <thead class="table-light">
+                  <tr>
+                    <th>Item</th>
+                    <th>Rate</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
                 <tbody>
                   <tr>
-                    <td class="fw-semibold">Cost per KM:</td>
-                    <td id="displayCostPerKm"></td>
+                    <td>Travel Cost</td>
+                    <td id="displayTravelRate"></td>
+                    <td id="displayTravelQty"></td>
+                    <td id="displayTravelTotal"></td>
                   </tr>
                   <tr>
-                    <td class="fw-semibold">Toll:</td>
-                    <td id="displayToll"></td>
+                    <td>Tolls</td>
+                    <td></td>
+                    <td></td>
+                    <td id="displayTollTotal"></td>
                   </tr>
                   <tr>
-                    <td class="fw-semibold">Extra Expenses:</td>
-                    <td id="displayExtras"></td>
-                  </tr>
-                  <tr class="border-top">
-                    <td class="fw-bold">Total Cost:</td>
-                    <td id="displayTotal"></td>
+                    <td>Extra Expenses</td>
+                    <td></td>
+                    <td></td>
+                    <td id="displayExtrasTotal"></td>
                   </tr>
                 </tbody>
+                <tfoot>
+                  <tr class="border-top fw-bold">
+                    <td colspan="3" class="text-end">Total</td>
+                    <td id="displayInvoiceDetailsTotal"></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
+            <!-- Cost Section End -->
 
             <div class="text-end mt-3">
               <p class="mb-0">Thank you for using our service!</p>
             </div>
 
-            <div class="text-center mt-4" style="font-size:0.8rem;">
+            <!-- <div class="text-center mt-4" style="font-size:0.8rem;">
               &copy; EasyLauncher.net . All rights reserved.
+            </div> -->
+
+            <div class="text-end mt-3" style="font-size:0.8rem;">
+              <p class="fw-bold text-danger">Note: Applicable taxes will be paid extra.</p>
+              &copy; 2024 <a href="https://EasyLauncher.net" target="_blank" rel="noopener noreferrer">EasyLauncher.net</a>. All rights reserved.
             </div>
 
           </div>
@@ -194,7 +218,6 @@ const TEST_MODE = false;
             <button id="downloadPdf" class="btn btn-success me-2">Download as PDF</button>
             <button id="shareInvoice" class="btn btn-success me-2">Share Invoice</button>
             <button id="printInvoice" class="btn btn-outline-primary">Print Invoice</button>
-            <button type="button" class="btn btn-outline-primary">Primary</button>
           </div>
           <!-- Action Buttons End -->
           
@@ -265,38 +288,89 @@ const TEST_MODE = false;
     document.getElementById('displayStartDate').textContent = startDate;
     document.getElementById('displayEndDate').textContent = endDate;
     document.getElementById('displayDistance').textContent = distance.toFixed(2) + ' KM';
-    document.getElementById('displayCostPerKm').textContent = costPerKm.toFixed(2);
-    document.getElementById('displayToll').textContent = toll.toFixed(2);
-    document.getElementById('displayExtras').textContent = extras.toFixed(2);
-    document.getElementById('displayTotal').textContent = totalCost.toFixed(2);
+
+    document.getElementById('displayTravelRate').textContent = costPerKm.toFixed(2);
+    document.getElementById('displayTravelQty').textContent = distance.toFixed(2);
+    document.getElementById('displayTravelTotal').textContent = travelCost.toFixed(2);
+
+    document.getElementById('displayTollTotal').textContent = toll.toFixed(2);
+    document.getElementById('displayExtrasTotal').textContent = extras.toFixed(2);
+
+    document.getElementById('displayInvoiceDetailsTotal').textContent = totalCost.toFixed(2);
 
     invoiceEl.classList.remove('d-none');
     document.querySelector('.download-btn').classList.remove('d-none');
   });
 
+  // downloadPdfBtn.addEventListener('click', async () => {
+  //   const { jsPDF } = window.jspdf;
+  //   const pdf = new jsPDF('p', 'pt', 'a4');
+
+  //   // Short delay to ensure images/fonts are loaded
+  //   await new Promise(res => setTimeout(res, 300));
+
+  //   const now = new Date();
+  //   const fileName = `invoice_${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}-${String(now.getSeconds()).padStart(2,'0')}.pdf`;
+
+  //   await pdf.html(invoiceEl, {
+  //     callback: function (pdf) {
+  //       pdf.save(fileName);
+  //     },
+  //     autoPaging: true,
+  //     x: 10,
+  //     y: 10,
+  //     html2canvas: {
+  //       useCORS: true,
+  //       scale: 2,
+  //       windowWidth: 1024, // Ensure this is large enough to capture full width
+  //       windowHeight: 2000 // Increase if content is tall
+  //     }
+  //   });
+  // });
+
   downloadPdfBtn.addEventListener('click', async () => {
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'pt', 'a4');
 
-    // Short delay to ensure images/fonts are loaded
+    // Ensure the invoice is visible and laid out properly.
+    // You might want to scroll to it or wait to ensure fonts/images are loaded.
+    invoiceEl.scrollIntoView();
     await new Promise(res => setTimeout(res, 300));
 
-    const now = new Date();
-    const fileName = `invoice_${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}-${String(now.getSeconds()).padStart(2,'0')}.pdf`;
-
-    await pdf.html(invoiceEl, {
-      callback: function (pdf) {
-        pdf.save(fileName);
-      },
-      autoPaging: true,
-      x: 10,
-      y: 10,
-      html2canvas: {
-        useCORS: true,
-        scale: 2
-      }
+    // Capture the invoice using html2canvas
+    const canvas = await html2canvas(invoiceEl, {
+      useCORS: true, 
+      scale: 2, // Increase for better quality
+      windowWidth: invoiceEl.scrollWidth,
+      windowHeight: invoiceEl.scrollHeight
     });
+
+    const imgData = canvas.toDataURL('image/png');
+
+    // Initialize jsPDF
+    // A4 size in points (pt): 595.28 x 841.89 at 72 DPI
+    const pdf = new jsPDF('p', 'pt', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    // Original canvas dimensions
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+
+    // Calculate a ratio to fit the entire image onto the page
+    const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+    const newImgWidth = imgWidth * ratio;
+    const newImgHeight = imgHeight * ratio;
+
+    // Add the image to the PDF
+    pdf.addImage(imgData, 'PNG', 0, 0, newImgWidth, newImgHeight);
+
+    // Generate a filename with a timestamp
+    const now = new Date();
+    const fileName = `invoice_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}.pdf`;
+
+    pdf.save(fileName);
   });
+
 
   shareBtn.addEventListener('click', async () => {
     const { jsPDF } = window.jspdf;
