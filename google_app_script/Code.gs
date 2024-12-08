@@ -67,9 +67,11 @@ function doPost(e) {
     let rowData = [
       data.startDate, 
       data.endDate, 
-      distance.toString(),
+      data.startMeter,
+      data.endMeter,
       toll.toString(),
       extras.toString(),
+      distance.toString(),
       costPerKm.toString(),
       totalCost.toString()
     ];
@@ -114,5 +116,6 @@ function jsonResponse(success, data, error) {
 
   let response = ContentService.createTextOutput(JSON.stringify(output))
     .setMimeType(ContentService.MimeType.JSON);
+
   return response;
 }

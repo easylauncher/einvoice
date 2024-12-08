@@ -15,6 +15,17 @@
   rel="stylesheet"
 />
 
+<!-- Google tag (gtag.js) Start -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-04NSN50YTR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-04NSN50YTR');
+</script>
+<!-- Google tag (gtag.js) End -->
+
 <title>Invoice Generator</title>
 <style>
   body {
@@ -70,9 +81,9 @@
 // Set this to true for testing mode.
 const TEST_MODE = true;
 // Ideally, do not hardcode the API key here. Retrieve it securely.
-const API_KEY = "YOUR_SECRET_API_KEY";
+const API_KEY = "7ep3X6Vg1tJk3ACk6hG2gQ6YypgL91E6";
 const API_URL = "https://script.google.com"
-const DEPLOYMENT_ID = "7ep3X6Vg1tJk3ACk6hG2gQ6YypgL91E6"
+const DEPLOYMENT_ID = "AKfycbwiNLcQDa-Vbd4eDWcy6_vvV_5_U8xIfjEPX1Y0GTQUjkbkoq4ylADe-e5C1R0RandcPQ"
 </script>
 
 <!-- Navbar -->
@@ -284,14 +295,14 @@ const DEPLOYMENT_ID = "7ep3X6Vg1tJk3ACk6hG2gQ6YypgL91E6"
       document.getElementById('displayEndDate').textContent = invoiceData.endDate;
       document.getElementById('displayDistance').textContent = distance.toFixed(2) + ' KM';
 
-      document.getElementById('displayTravelRate').textContent = invoiceData.costPerKm.toFixed(2);
+      document.getElementById('displayTravelRate').textContent = "₹" + invoiceData.costPerKm.toFixed(2);
       document.getElementById('displayTravelQty').textContent = distance.toFixed(2);
-      document.getElementById('displayTravelTotal').textContent = travelCost.toFixed(2);
+      document.getElementById('displayTravelTotal').textContent = "₹" + travelCost.toFixed(2);
 
-      document.getElementById('displayTollTotal').textContent = invoiceData.toll.toFixed(2);
-      document.getElementById('displayExtrasTotal').textContent = invoiceData.extras.toFixed(2);
+      document.getElementById('displayTollTotal').textContent = "₹" + invoiceData.toll.toFixed(2);
+      document.getElementById('displayExtrasTotal').textContent = "₹" + invoiceData.extras.toFixed(2);
+      document.getElementById('displayInvoiceDetailsTotal').textContent = "₹" + totalCost.toFixed(2);
 
-      document.getElementById('displayInvoiceDetailsTotal').textContent = totalCost.toFixed(2);
 
       invoiceEl.classList.remove('d-none');
       document.querySelector('.download-btn').classList.remove('d-none');
@@ -467,10 +478,15 @@ function get_invoice_data() {
   };
 
   try {
+
     const response = await fetch(url, {
+      // Keep redirect so that it can redirect without getting CORS error
+      redirect: "follow",
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        // Json would cause CORS error
+        // "Content-Type": "application/json",
+        "Content-Type": "text/plain;charset=utf-8",
         // Do not send API key in headers since Apps Script Web Apps cannot reliably read custom headers.
       },
       body: JSON.stringify(payload)
