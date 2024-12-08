@@ -23,6 +23,7 @@ function doPost(e) {
     var SHEET_NAME = "invoices";
 
     if (!data.apiKey || data.apiKey !== API_KEY) {
+      Logger.log("Unauthorized access attempt with API key: " + data.apiKey);
       return jsonResponse(false, null, "Unauthorized: Invalid API key");
     }
 
@@ -30,6 +31,7 @@ function doPost(e) {
     let requiredFields = ["startDate", "endDate", "startMeter", "endMeter", "costPerKm"];
     for (let field of requiredFields) {
       if (!data.hasOwnProperty(field) || data[field] === "") {
+        Logger.log(`Missing or empty required field: ${field}`);
         return jsonResponse(false, null, `Missing or empty required field: ${field}`);
       }
     }
@@ -43,10 +45,12 @@ function doPost(e) {
 
     // Check for numeric validity
     if (isNaN(startMeter) || isNaN(endMeter) || isNaN(costPerKm)) {
+      Logger.log("Invalid numeric value for meter readings or costPerKm");
       return jsonResponse(false, null, "Invalid numeric value for meter readings or costPerKm");
     }
 
     if (endMeter < startMeter) {
+      Logger.log("endMeter must be greater than or equal to startMeter");
       return jsonResponse(false, null, "endMeter must be greater than or equal to startMeter");
     }
 
@@ -59,6 +63,7 @@ function doPost(e) {
     var ss = SpreadsheetApp.openById(SHEET_ID);
     var sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet) {
+      Logger.log("Sheet not found: " + SHEET_NAME);
       return jsonResponse(false, null, "Sheet not found");
     }
 
@@ -81,6 +86,8 @@ function doPost(e) {
       data.timestamp || new Date().toISOString()
     ];
     sheet.appendRow(rowData);
+
+    Logger.log("Row appended successfully: " + JSON.stringify(rowData));
 
     // Prepare success response data
     let responseData = {

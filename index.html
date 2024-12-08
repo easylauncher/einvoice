@@ -15,6 +15,35 @@
   rel="stylesheet"
 />
 
+<script>
+
+  const PRODUCTION_DOMAINS = [
+    'einvoice.hostapp.in',
+    'www.einvoice.hostapp.in'
+  ];
+
+  function isProductionDomain(hostname, productionDomains) {
+    const normalizedHostname = hostname.toLowerCase();
+    const normalizedDomains = productionDomains.map(domain => domain.toLowerCase());
+
+    return normalizedDomains.includes(normalizedHostname);
+  }
+
+  const CURRENT_HOSTNAME = window.location.hostname;
+  const IS_PRODUCTION = isProductionDomain(CURRENT_HOSTNAME, PRODUCTION_DOMAINS);
+  const TEST_MODE = !IS_PRODUCTION;
+  
+  console.log(`Running in ${TEST_MODE ? 'TEST' : 'PRODUCTION'} mode.`);
+</script>
+
+<script>
+
+  // Ideally, do not hardcode the API key here. Retrieve it securely.
+  const API_KEY = "7ep3X6Vg1tJk3ACk6hG2gQ6YypgL91E6";
+  const API_URL = "https://script.google.com"
+  const DEPLOYMENT_ID = "AKfycbzzI36N3dKO8ZrYXUtRMH-LKXwx_qbt_Jbf48BTFx_SMytU3wYOfJFJJPdjOAZqOsSPgw"
+</script>
+
 <!-- Google tag (gtag.js) Start -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-04NSN50YTR"></script>
 <script>
@@ -75,16 +104,6 @@
 </style>
 </head>
 <body>
-
-
-<script>
-// Set this to true for testing mode.
-const TEST_MODE = true;
-// Ideally, do not hardcode the API key here. Retrieve it securely.
-const API_KEY = "7ep3X6Vg1tJk3ACk6hG2gQ6YypgL91E6";
-const API_URL = "https://script.google.com"
-const DEPLOYMENT_ID = "AKfycbwiNLcQDa-Vbd4eDWcy6_vvV_5_U8xIfjEPX1Y0GTQUjkbkoq4ylADe-e5C1R0RandcPQ"
-</script>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
@@ -255,6 +274,79 @@ const DEPLOYMENT_ID = "AKfycbwiNLcQDa-Vbd4eDWcy6_vvV_5_U8xIfjEPX1Y0GTQUjkbkoq4yl
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" referrerpolicy="no-referrer"></script>
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-BuZV0Wno7SqfZkHDZT/N+7SwMkMyNPRnsHFKgu4pBaetWPgnablNGP0Z26G7NkfWJ+lnx9Pf3I7+QI6+tWjk4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" referrerpolicy="no-referrer"></script>
+
+<!-- Include this script in your HTML file, preferably before your main script -->
+<script>
+  /**
+   * Fetches the user's public IP address using ipify API.
+   * @returns {Promise<string>} The IP address as a string.
+   */
+  async function fetchUserIP() {
+    try {
+      const response = await fetch('https://api.ipify.org?format=json');
+      const data = await response.json();
+      return data.ip;
+    } catch (error) {
+      console.error('Error fetching IP address:', error);
+      return 'Unavailable';
+    }
+  }
+
+  /**
+   * Parses the User-Agent string to extract OS and device type.
+   * @returns {Object} An object containing OS and device type.
+   */
+  function parseUserAgent() {
+    const ua = navigator.userAgent;
+    let os = 'Unknown';
+    let deviceType = 'Unknown';
+
+    // Simple parsing examples. For more accurate parsing, consider using a library like Bowser.
+    if (/windows nt/i.test(ua)) {
+      os = 'Windows';
+    } else if (/macintosh|mac os x/i.test(ua)) {
+      os = 'MacOS';
+    } else if (/linux/i.test(ua)) {
+      os = 'Linux';
+    } else if (/android/i.test(ua)) {
+      os = 'Android';
+    } else if (/iphone|ipad|ipod/i.test(ua)) {
+      os = 'iOS';
+    }
+
+    if (/mobile/i.test(ua)) {
+      deviceType = 'Mobile';
+    } else if (/tablet/i.test(ua)) {
+      deviceType = 'Tablet';
+    } else {
+      deviceType = 'Desktop';
+    }
+
+    return { os, deviceType };
+  }
+
+  /**
+   * Gathers all additional user data.
+   * @returns {Promise<Object>} An object containing user data.
+   */
+  async function gatherUserData() {
+    const ipAddress = await fetchUserIP();
+    const userAgent = navigator.userAgent;
+    const { os, deviceType } = parseUserAgent();
+    const referrer = document.referrer || 'Direct';
+    const timestamp = new Date().toISOString();
+
+    return {
+      ipAddress,
+      userAgent,
+      os,
+      deviceType,
+      referrer,
+      timestamp
+    };
+  }
+</script>
+
 
 <script>
   const generateBtn = document.getElementById('generateBtn');
@@ -458,23 +550,41 @@ function get_invoice_data() {
  async function sendInvoiceData() {
 
   invoiceData = get_invoice_data();
+
   // Validate input before sending
-  if (!invoiceData.startDate || !invoiceData.endDate || isNaN(invoiceData.startMeter) 
-      || isNaN(invoiceData.endMeter) || isNaN(invoiceData.costPerKm)) {
-    throw new Error("Missing or invalid required fields (startDate, endDate, startMeter, endMeter, costPerKm).");
+  if (
+    !invoiceData.startDate ||
+    !invoiceData.endDate ||
+    isNaN(invoiceData.startMeter) ||
+    isNaN(invoiceData.endMeter) ||
+    isNaN(invoiceData.costPerKm)
+  ) {
+    throw new Error(
+      "Missing or invalid required fields (startDate, endDate, startMeter, endMeter, costPerKm)."
+    );
   }
 
   const url = `${API_URL}/macros/s/${DEPLOYMENT_ID}/exec`;
 
+  // const payload = {
+  //   apiKey: API_KEY,
+  //   startDate: invoiceData.startDate,
+  //   endDate: invoiceData.endDate,
+  //   startMeter: invoiceData.startMeter,
+  //   endMeter: invoiceData.endMeter,
+  //   toll: invoiceData.toll || 0,
+  //   extras: invoiceData.extras || 0,
+  //   costPerKm: invoiceData.costPerKm
+  // };
+
+  // Gather additional user data
+  const userData = await gatherUserData();
+
+  // Combine invoice data and user data
   const payload = {
-    apiKey: API_KEY,
-    startDate: invoiceData.startDate,
-    endDate: invoiceData.endDate,
-    startMeter: invoiceData.startMeter,
-    endMeter: invoiceData.endMeter,
-    toll: invoiceData.toll || 0,
-    extras: invoiceData.extras || 0,
-    costPerKm: invoiceData.costPerKm
+    ...invoiceData,
+    ...userData,
+    apiKey: API_KEY
   };
 
   try {
