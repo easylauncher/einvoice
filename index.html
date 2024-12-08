@@ -69,6 +69,10 @@
 <script>
 // Set this to true for testing mode.
 const TEST_MODE = true;
+// Ideally, do not hardcode the API key here. Retrieve it securely.
+const API_KEY = "YOUR_SECRET_API_KEY";
+const API_URL = "https://script.google.com"
+const DEPLOYMENT_ID = "7ep3X6Vg1tJk3ACk6hG2gQ6YypgL91E6"
 </script>
 
 <!-- Navbar -->
@@ -262,44 +266,41 @@ const TEST_MODE = true;
   });
 
   generateBtn.addEventListener('click', () => {
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const startMeter = parseFloat(document.getElementById('startMeter').value);
-    const endMeter = parseFloat(document.getElementById('endMeter').value);
-    const toll = parseFloat(document.getElementById('toll').value) || 0;
-    const extras = parseFloat(document.getElementById('extras').value) || 0;
-    const costPerKm = parseFloat(document.getElementById('costPerKm').value);
 
-    if(!startDate || !endDate || isNaN(startMeter) || isNaN(endMeter) || isNaN(costPerKm)) {
-      alert('Please fill in all required fields properly.');
-      return;
-    }
+    invoiceData = get_invoice_data();
 
-    const distance = endMeter - startMeter;
+    const distance = invoiceData.endMeter - invoiceData.startMeter;
     if(distance < 0) {
       alert('End meter reading should be greater than or equal to start meter reading.');
       return;
     }
 
-    const travelCost = distance * costPerKm;
-    const totalCost = travelCost + toll + extras;
+    const travelCost = distance * invoiceData.costPerKm;
+    const totalCost = travelCost + invoiceData.toll + invoiceData.extras;
 
     // Populate invoice fields
-    document.getElementById('displayStartDate').textContent = startDate;
-    document.getElementById('displayEndDate').textContent = endDate;
-    document.getElementById('displayDistance').textContent = distance.toFixed(2) + ' KM';
+    try {
+      document.getElementById('displayStartDate').textContent = invoiceData.startDate;
+      document.getElementById('displayEndDate').textContent = invoiceData.endDate;
+      document.getElementById('displayDistance').textContent = distance.toFixed(2) + ' KM';
 
-    document.getElementById('displayTravelRate').textContent = costPerKm.toFixed(2);
-    document.getElementById('displayTravelQty').textContent = distance.toFixed(2);
-    document.getElementById('displayTravelTotal').textContent = travelCost.toFixed(2);
+      document.getElementById('displayTravelRate').textContent = invoiceData.costPerKm.toFixed(2);
+      document.getElementById('displayTravelQty').textContent = distance.toFixed(2);
+      document.getElementById('displayTravelTotal').textContent = travelCost.toFixed(2);
 
-    document.getElementById('displayTollTotal').textContent = toll.toFixed(2);
-    document.getElementById('displayExtrasTotal').textContent = extras.toFixed(2);
+      document.getElementById('displayTollTotal').textContent = invoiceData.toll.toFixed(2);
+      document.getElementById('displayExtrasTotal').textContent = invoiceData.extras.toFixed(2);
 
-    document.getElementById('displayInvoiceDetailsTotal').textContent = totalCost.toFixed(2);
+      document.getElementById('displayInvoiceDetailsTotal').textContent = totalCost.toFixed(2);
 
-    invoiceEl.classList.remove('d-none');
-    document.querySelector('.download-btn').classList.remove('d-none');
+      invoiceEl.classList.remove('d-none');
+      document.querySelector('.download-btn').classList.remove('d-none');
+    } catch (error) {
+      console.error("Error populating invoice fields:", error);
+      alert('Failed to generate invoice. Please try again.');
+    }
+  
+  
   });
 
   // downloadPdfBtn.addEventListener('click', async () => {
@@ -407,9 +408,88 @@ const TEST_MODE = true;
   });
 
   printInvoiceBtn.addEventListener('click', () => {
+    sendInvoiceData();
     window.print();
   });
   
+
+</script>
+
+<script>
+
+
+function get_invoice_data() {
+
+  try {
+    const invoiceData = {
+      startDate: document.getElementById('startDate').value,
+      endDate: document.getElementById('endDate').value,
+      startMeter: parseFloat(document.getElementById('startMeter').value),
+      endMeter: parseFloat(document.getElementById('endMeter').value),
+      toll: parseFloat(document.getElementById('toll').value) || 0,
+      extras: parseFloat(document.getElementById('extras').value) || 0,
+      costPerKm: parseFloat(document.getElementById('costPerKm').value)
+    };
+
+    if(!invoiceData.startDate || !invoiceData.endDate || isNaN(invoiceData.startMeter) || isNaN(invoiceData.endMeter) || isNaN(invoiceData.costPerKm)) {
+      alert('Please fill in all required fields properly.');
+      return;
+    }
+
+    return invoiceData;
+  } catch (error) {
+    console.error("Error getting invoice data:", error);
+    alert('Failed to get invoice data. Please try again.');
+  }
+
+}
+
+ async function sendInvoiceData() {
+
+  invoiceData = get_invoice_data();
+  // Validate input before sending
+  if (!invoiceData.startDate || !invoiceData.endDate || isNaN(invoiceData.startMeter) 
+      || isNaN(invoiceData.endMeter) || isNaN(invoiceData.costPerKm)) {
+    throw new Error("Missing or invalid required fields (startDate, endDate, startMeter, endMeter, costPerKm).");
+  }
+
+  const url = `${API_URL}/macros/s/${DEPLOYMENT_ID}/exec`;
+
+  const payload = {
+    apiKey: API_KEY,
+    startDate: invoiceData.startDate,
+    endDate: invoiceData.endDate,
+    startMeter: invoiceData.startMeter,
+    endMeter: invoiceData.endMeter,
+    toll: invoiceData.toll || 0,
+    extras: invoiceData.extras || 0,
+    costPerKm: invoiceData.costPerKm
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Do not send API key in headers since Apps Script Web Apps cannot reliably read custom headers.
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      // Handle errors returned by the server
+      const errorMsg = result.error || `HTTP error: ${response.status}`;
+      throw new Error(`Server returned an error: ${errorMsg}`);
+    }
+
+    // Return the successful result data
+    return result.data;
+  } catch (error) {
+    console.error("Error sending invoice data:", error);
+    throw error; // Re-throw so that calling code can handle it
+  }
+}
 
 </script>
 
