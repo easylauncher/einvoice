@@ -18,10 +18,9 @@ function doPost(e) {
     Logger.log("Received data: " + JSON.stringify(data));
 
     // Security check: Verify API key
-    // Set a secret key that must be included in the request
-    var API_KEY = "7ep3X6Vg1tJk3ACk6hG2gQ6YypgL91E6"; // Ideally store this in Script Properties, not hard-coded
-    var SHEET_ID = "1vMczyY9mY37EwKL78xnPbnUoBlBtqaspYSNwt47etQw"
-    var SHEET_NAME = "invoices"
+    var API_KEY = "7ep3X6Vg1tJk3ACk6hG2gQ6YypgL91E6"; // Ideally store this in Script Properties
+    var SHEET_ID = "1vMczyY9mY37EwKL78xnPbnUoBlBtqaspYSNwt47etQw";
+    var SHEET_NAME = "invoices";
 
     if (!data.apiKey || data.apiKey !== API_KEY) {
       return jsonResponse(false, null, "Unauthorized: Invalid API key");
@@ -63,17 +62,23 @@ function doPost(e) {
       return jsonResponse(false, null, "Sheet not found");
     }
 
-    // Append row with processed data
+    // Append row with processed data and user info
     let rowData = [
       data.startDate, 
       data.endDate, 
-      data.startMeter,
-      data.endMeter,
-      toll.toString(),
-      extras.toString(),
-      distance.toString(),
-      costPerKm.toString(),
-      totalCost.toString()
+      startMeter,
+      endMeter,
+      toll.toFixed(2),
+      extras.toFixed(2),
+      distance.toFixed(2),
+      costPerKm.toFixed(2),
+      totalCost.toFixed(2),
+      data.ipAddress || "Unavailable",
+      data.userAgent || "Unavailable",
+      data.os || "Unavailable",
+      data.deviceType || "Unavailable",
+      data.referrer || "Unavailable",
+      data.timestamp || new Date().toISOString()
     ];
     sheet.appendRow(rowData);
 
@@ -85,7 +90,13 @@ function doPost(e) {
       toll: toll,
       extras: extras,
       costPerKm: costPerKm,
-      totalCost: totalCost
+      totalCost: totalCost,
+      ipAddress: data.ipAddress || "Unavailable",
+      userAgent: data.userAgent || "Unavailable",
+      os: data.os || "Unavailable",
+      deviceType: data.deviceType || "Unavailable",
+      referrer: data.referrer || "Unavailable",
+      timestamp: data.timestamp || new Date().toISOString()
     };
 
     return jsonResponse(true, responseData, null);
