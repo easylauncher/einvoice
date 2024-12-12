@@ -32,7 +32,7 @@
   const CURRENT_HOSTNAME = window.location.hostname;
   const IS_PRODUCTION = isProductionDomain(CURRENT_HOSTNAME, PRODUCTION_DOMAINS);
   const TEST_MODE = !IS_PRODUCTION;
-  
+
   console.log(`Running in ${TEST_MODE ? 'TEST' : 'PRODUCTION'} mode.`);
 </script>
 
@@ -146,7 +146,7 @@
           </div>
           <div class="mb-3">
             <label for="costPerKm" class="form-label">Cost per KM</label>
-            <input type="number" step="0.01" class="form-control" id="costPerKm" placeholder="e.g. 5.00" />
+            <input type="number" step="0.01" class="form-control" id="costPerKm" placeholder="e.g. 12.00" />
           </div>
           <button class="btn btn-primary w-100" id="generateBtn">Generate Invoice</button>
         </div>
