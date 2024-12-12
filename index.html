@@ -136,6 +136,10 @@
             </div>
           </div>
           <div class="mb-3">
+            <label for="fixedPrice" class="form-label">Fixed Price (if applicable)</label>
+            <input type="number" step="50" class="form-control" id="fixedPrice" placeholder="e.g. 2500" />
+          </div>
+          <div class="mb-3">
             <label for="startDate" class="form-label">Journey Start Date and Time</label>
             <input type="datetime-local" class="form-control" id="startDate" step="900" />
           </div>
@@ -373,6 +377,7 @@
   // If TEST_MODE is true, populate form with sample values on load
   document.addEventListener('DOMContentLoaded', () => {
     if (TEST_MODE) {
+      document.getElementById('fixedPrice').value = '2500';
       document.getElementById('startDate').value = '2024-12-01 10:00';
       document.getElementById('startMeter').value = '1200';
       document.getElementById('endDate').value = '2024-12-02 11:00';
@@ -384,17 +389,18 @@
   });
 
   generateBtn.addEventListener('click', () => {
-
-    invoiceData = get_invoice_data();
+    const invoiceData = get_invoice_data();
 
     const distance = invoiceData.endMeter - invoiceData.startMeter;
-    if(distance < 0) {
+    if (distance < 0) {
       alert('End meter reading should be greater than or equal to start meter reading.');
       return;
     }
 
     const travelCost = distance * invoiceData.costPerKm;
-    const totalCost = travelCost + invoiceData.toll + invoiceData.extras;
+    const fixedPrice = invoiceData.fixedPrice || 0; // Retrieve fixed price, default to 0 if not set
+    const finalTravelCost = Math.max(travelCost, fixedPrice); // Use fixed price if greater than travelCost
+    const totalCost = finalTravelCost + invoiceData.toll + invoiceData.extras;
 
     // Populate invoice fields
     try {
@@ -404,12 +410,11 @@
 
       document.getElementById('displayTravelRate').textContent = "₹" + invoiceData.costPerKm.toFixed(2);
       document.getElementById('displayTravelQty').textContent = distance.toFixed(2);
-      document.getElementById('displayTravelTotal').textContent = "₹" + travelCost.toFixed(2);
+      document.getElementById('displayTravelTotal').textContent = "₹" + finalTravelCost.toFixed(2);
 
       document.getElementById('displayTollTotal').textContent = "₹" + invoiceData.toll.toFixed(2);
       document.getElementById('displayExtrasTotal').textContent = "₹" + invoiceData.extras.toFixed(2);
       document.getElementById('displayInvoiceDetailsTotal').textContent = "₹" + totalCost.toFixed(2);
-
 
       invoiceEl.classList.remove('d-none');
       document.querySelector('.download-btn').classList.remove('d-none');
@@ -417,8 +422,6 @@
       console.error("Error populating invoice fields:", error);
       alert('Failed to generate invoice. Please try again.');
     }
-  
-  
   });
 
   // downloadPdfBtn.addEventListener('click', async () => {
@@ -546,7 +549,8 @@ function get_invoice_data() {
       toll: parseFloat(document.getElementById('toll').value) || 0,
       extras: parseFloat(document.getElementById('extras').value) || 0,
       costPerKm: parseFloat(document.getElementById('costPerKm').value),
-      journeyType: document.querySelector('input[name="journeyType"]:checked').value
+      fixedPrice: parseFloat(document.getElementById('fixedPrice').value) || 0, // Get fixed price
+      journeyType: document.querySelector('input[name="journeyType"]:checked').value // Get selected Journey type
     };
 
     if (!invoiceData.startDate || !invoiceData.endDate || isNaN(invoiceData.startMeter) || isNaN(invoiceData.endMeter) || isNaN(invoiceData.costPerKm)) {
