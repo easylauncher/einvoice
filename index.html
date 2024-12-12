@@ -121,16 +121,31 @@
         <div class="card-body">
           <h2 class="h5 mb-4">Input Details</h2>
           <div class="mb-3">
-            <label for="startDate" class="form-label">Journey Start Date</label>
-            <input type="date" class="form-control" id="startDate" />
+            <label class="form-label">Journey Type</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="journeyType" id="journeyTypeLocal" value="Local" checked>
+              <label class="form-check-label" for="journeyTypeLocal">
+                Local
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="journeyType" id="journeyTypeOutstation" value="Outstation">
+              <label class="form-check-label" for="journeyTypeOutstation">
+                Outstation
+              </label>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="startDate" class="form-label">Journey Start Date and Time</label>
+            <input type="datetime-local" class="form-control" id="startDate" />
           </div>
           <div class="mb-3">
             <label for="startMeter" class="form-label">Journey Start Meter Reading (KM)</label>
             <input type="number" class="form-control" id="startMeter" placeholder="e.g. 1200" />
           </div>
           <div class="mb-3">
-            <label for="endDate" class="form-label">Journey End Date</label>
-            <input type="date" class="form-control" id="endDate" />
+            <label for="endDate" class="form-label">Journey End Date and Time</label>
+            <input type="datetime-local" class="form-control" id="endDate" />
           </div>
           <div class="mb-3">
             <label for="endMeter" class="form-label">Journey End Meter Reading (KM)</label>
@@ -522,7 +537,6 @@
 
 
 function get_invoice_data() {
-
   try {
     const invoiceData = {
       startDate: document.getElementById('startDate').value,
@@ -531,10 +545,11 @@ function get_invoice_data() {
       endMeter: parseFloat(document.getElementById('endMeter').value),
       toll: parseFloat(document.getElementById('toll').value) || 0,
       extras: parseFloat(document.getElementById('extras').value) || 0,
-      costPerKm: parseFloat(document.getElementById('costPerKm').value)
+      costPerKm: parseFloat(document.getElementById('costPerKm').value),
+      journeyType: document.querySelector('input[name="journeyType"]:checked').value
     };
 
-    if(!invoiceData.startDate || !invoiceData.endDate || isNaN(invoiceData.startMeter) || isNaN(invoiceData.endMeter) || isNaN(invoiceData.costPerKm)) {
+    if (!invoiceData.startDate || !invoiceData.endDate || isNaN(invoiceData.startMeter) || isNaN(invoiceData.endMeter) || isNaN(invoiceData.costPerKm)) {
       alert('Please fill in all required fields properly.');
       return;
     }
@@ -544,8 +559,9 @@ function get_invoice_data() {
     console.error("Error getting invoice data:", error);
     alert('Failed to get invoice data. Please try again.');
   }
-
 }
+
+
 
  async function sendInvoiceData() {
 
