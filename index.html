@@ -384,7 +384,7 @@
       document.getElementById('endMeter').value = '1480';
       document.getElementById('toll').value = '150';
       document.getElementById('extras').value = '100';
-      document.getElementById('costPerKm').value = '11';
+      document.getElementById('costPerKm').value = '12';
     }
   });
 
@@ -399,6 +399,7 @@
 
     const travelCost = distance * invoiceData.costPerKm;
     const fixedPrice = invoiceData.fixedPrice || 0; // Retrieve fixed price, default to 0 if not set
+    const isFixedPriceUsed = fixedPrice > travelCost; // Determine if fixed price is used
     const finalTravelCost = Math.max(travelCost, fixedPrice); // Use fixed price if greater than travelCost
     const totalCost = finalTravelCost + invoiceData.toll + invoiceData.extras;
 
@@ -406,12 +407,18 @@
     try {
       document.getElementById('displayStartDate').textContent = invoiceData.startDate;
       document.getElementById('displayEndDate').textContent = invoiceData.endDate;
-      document.getElementById('displayDistance').textContent = distance.toFixed(2) + ' KM';
 
-      document.getElementById('displayTravelRate').textContent = "₹" + invoiceData.costPerKm.toFixed(2);
-      document.getElementById('displayTravelQty').textContent = distance.toFixed(2);
+      if (isFixedPriceUsed) {
+        document.getElementById('displayDistance').textContent = "N/A (Fixed Price)";
+        document.getElementById('displayTravelRate').textContent = "N/A";
+        document.getElementById('displayTravelQty').textContent = "N/A";
+      } else {
+        document.getElementById('displayDistance').textContent = distance.toFixed(2) + ' KM';
+        document.getElementById('displayTravelRate').textContent = "₹" + invoiceData.costPerKm.toFixed(2);
+        document.getElementById('displayTravelQty').textContent = distance.toFixed(2);
+      }
+
       document.getElementById('displayTravelTotal').textContent = "₹" + finalTravelCost.toFixed(2);
-
       document.getElementById('displayTollTotal').textContent = "₹" + invoiceData.toll.toFixed(2);
       document.getElementById('displayExtrasTotal').textContent = "₹" + invoiceData.extras.toFixed(2);
       document.getElementById('displayInvoiceDetailsTotal').textContent = "₹" + totalCost.toFixed(2);
@@ -423,6 +430,7 @@
       alert('Failed to generate invoice. Please try again.');
     }
   });
+
 
   // downloadPdfBtn.addEventListener('click', async () => {
   //   const { jsPDF } = window.jspdf;
