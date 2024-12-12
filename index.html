@@ -137,7 +137,7 @@
           </div>
           <div class="mb-3">
             <label for="startDate" class="form-label">Journey Start Date and Time</label>
-            <input type="datetime-local" class="form-control" id="startDate" />
+            <input type="datetime-local" class="form-control" id="startDate" step="900" />
           </div>
           <div class="mb-3">
             <label for="startMeter" class="form-label">Journey Start Meter Reading (KM)</label>
@@ -145,7 +145,7 @@
           </div>
           <div class="mb-3">
             <label for="endDate" class="form-label">Journey End Date and Time</label>
-            <input type="datetime-local" class="form-control" id="endDate" />
+            <input type="datetime-local" class="form-control" id="endDate" step="900" />
           </div>
           <div class="mb-3">
             <label for="endMeter" class="form-label">Journey End Meter Reading (KM)</label>
@@ -373,9 +373,9 @@
   // If TEST_MODE is true, populate form with sample values on load
   document.addEventListener('DOMContentLoaded', () => {
     if (TEST_MODE) {
-      document.getElementById('startDate').value = '2024-12-01';
+      document.getElementById('startDate').value = '2024-12-01 10:00';
       document.getElementById('startMeter').value = '1200';
-      document.getElementById('endDate').value = '2024-12-02';
+      document.getElementById('endDate').value = '2024-12-02 11:00';
       document.getElementById('endMeter').value = '1480';
       document.getElementById('toll').value = '150';
       document.getElementById('extras').value = '100';
